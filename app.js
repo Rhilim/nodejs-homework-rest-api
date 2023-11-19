@@ -5,7 +5,7 @@ const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
 
-const authRoutes = require("./routes/api/auth");
+const userRoutes = require("./routes/api/users");
 const contactRoutes = require("./routes/api/contacts");
 
 const app = express();
@@ -16,7 +16,7 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/contacts", contactRoutes);
 
 app.use((req, res) => {

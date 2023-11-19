@@ -1,11 +1,11 @@
 const express = require("express");
 
-const AuthController = require("../../controllers/auth");
+const UsersController = require("../../controllers/users");
 
 const router = express.Router();
 
 const jsonParser = express.json();
 
-router.post("/register", jsonParser, AuthController.register);
+router.post("/register", jsonParser, UsersController.register);
 
 module.exports = router;
