@@ -1,5 +1,5 @@
 const { isValidObjectId } = require("mongoose");
-const Joi = require('joi');
+const Joi = require("joi");
 const Contact = require("../models/contact");
 
 const contactSchema = Joi.object({
@@ -19,9 +19,10 @@ async function validateContactId(req, res, next) {
 }
 
 async function getContacts(req, res, next) {
+  console.log({ user: req.user });
   try {
     const contacts = await Contact.find().exec();
-    console.log(contacts);
+
     res.send(contacts);
   } catch (err) {
     next(err);

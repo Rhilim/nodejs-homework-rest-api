@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Joi = require("joi");
 
@@ -42,6 +43,7 @@ async function register(req, res, next) {
   }
 }
 
+
 async function login(req, res, next) {
   const { email, password } = req.body;
 
@@ -69,7 +71,13 @@ async function login(req, res, next) {
       return res.status(401).send({ message: "Email or password is wrong" });
     }
 
-    res.send({ token: "TOKEN" });
+    const token = jwt.sign(
+      { id: user._id, name: user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.send({ token });
   } catch (error) {
     next(error);
   }
