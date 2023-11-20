@@ -21,7 +21,7 @@ async function validateContactId(req, res, next) {
 async function getContacts(req, res, next) {
   console.log({ user: req.user });
   try {
-    const contacts = await Contact.find().exec();
+    const contacts = await Contact.find({ owner: req.user.id }).exec();
 
     res.send(contacts);
   } catch (err) {
@@ -35,6 +35,11 @@ async function getContact(req, res, next) {
     if (contact === null) {
       return res.status(404).send("Contact not found");
     }
+
+    if (contact.owner.toString() !== req.user.id) {
+      return res.status(404).send("Contact not found");
+    }
+
     res.json(contact);
   } catch (err) {
     next(err);
@@ -53,6 +58,7 @@ async function createContact(req, res, next) {
     email: req.body.email,
     phone: req.body.phone,
     favorite: Boolean(req.body.favorite),
+    owner: req.user.id,
   };
 
   try {
