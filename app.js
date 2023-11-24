@@ -1,5 +1,6 @@
 require("dotenv").config();
 require("./server.js");
+const path = require("node:path");
 
 const express = require("express");
 const logger = require("morgan");
@@ -9,6 +10,7 @@ const auth = require("./middleware/auth");
 
 const userRoutes = require("./routes/api/users");
 const contactRoutes = require("./routes/api/contacts");
+const avatarRoutes = require("./routes/api/upload");
 
 const app = express();
 
@@ -18,8 +20,10 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
+app.use("/avatars", express.static(path.join(__dirname, "public/avatars")));
 app.use("/api/users", userRoutes);
 app.use("/api/contacts", auth, contactRoutes);
+app.use("/api/upload", auth, avatarRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
