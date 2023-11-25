@@ -11,6 +11,7 @@ const auth = require("./middleware/auth");
 const userRoutes = require("./routes/api/users");
 const contactRoutes = require("./routes/api/contacts");
 const avatarRoutes = require("./routes/api/upload");
+const multer = require("multer");
 
 const app = express();
 
@@ -29,8 +30,14 @@ app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
-app.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message });
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.message === "Unexpected field") {
+      return res.status(404).json({ message: "Invalid body" });
+    }
+  }
+
+  res.status(500).json({ message: error.message });
 });
 
 module.exports = app;
