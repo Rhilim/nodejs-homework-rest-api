@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 const Joi = require("joi");
+const gravatar = require("gravatar");
+const User = require("../models/user");
 
 const registerSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -33,11 +34,28 @@ async function register(req, res, next) {
     if (user !== null) {
       return res.status(409).send({ message: "Email in use" });
     }
+    const avatarURL = gravatar.url(email, {
+      s: "200",
+      r: "pg",
+      d: "identicon",
+    });
 
     const passwordHash = await bcrypt.hash(password, 10);
-    await User.create({ email, password: passwordHash });
+    
+    const newUser = await User.create({
+      email,
+      password: passwordHash,
+      avatarURL,
+    });
 
-    res.status(201).send({ message: "User registered successfully" });
+    res.status(201).send({
+      message: "User registered successfully",
+      user: {
+        email: newUser.email,
+        subscription: newUser.subscription,
+        avatarURL: newUser.avatarURL,
+      },
+    });
   } catch (error) {
     next(error);
   }
