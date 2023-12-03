@@ -15,5 +15,6 @@ router.post("/register", jsonParser, UsersController.register);
 router.post("/login", jsonParser, UsersController.login);
 router.post("/current", auth, jsonParser, UsersController.current);
 router.post("/logout", auth, UsersController.logout);
+router.get("/verify/:verificationToken", UsersController.verifyReg);
 
 module.exports = router;
