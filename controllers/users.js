@@ -164,7 +164,7 @@ async function verifyReg(req, res, next) {
     console.log("Received Token:", verificationToken);
     console.log("User:", user);
 
-    if (!user) {
+    if (user === null) {
       return res.status(404).send({ message: "Not found" });
     }
 
@@ -178,4 +178,47 @@ async function verifyReg(req, res, next) {
   }
 }
 
-module.exports = { register, login, current, logout, verifyReg };
+const resendEmailValidationSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+
+async function resendRegEmail(req, res, next) {
+
+  const { error } = resendEmailValidationSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email }).exec();
+
+    if (user === null) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.verify) {
+      return res
+        .status(400)
+        .json({ message: "Verification has already been passed" });
+    }
+
+    await sendEmail(user.email, user.verificationToken);
+
+    return res.status(200).json({ message: "Verification email sent" });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = {
+  register,
+  login,
+  current,
+  logout,
+  verifyReg,
+  resendRegEmail,
+};
